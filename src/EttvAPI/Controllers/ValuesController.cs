@@ -11,7 +11,7 @@ namespace EttvAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "dotnet", "is here !" };
+            return new string[] { "dotnet new", "is here !" };
         }
 
         // GET api/values/5
