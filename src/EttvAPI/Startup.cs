@@ -8,6 +8,7 @@ using EttvAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,8 +29,16 @@ namespace EttvAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                // options.AddPolicy("AllowMyOrigin",builder=>builder.WithOrigins("http://localhost:3000"));
+                options.AddPolicy("AllowMyOrigin",builder=>builder.AllowAnyOrigin());
+            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add(new CorsAuthorizationFilterFactory("AllowMyOrigin"));
+            });
             services.AddDbContext<EttvDbContext>(option =>
                 option.UseSqlServer(Configuration.GetConnectionString("EttvDb")));
 
@@ -60,6 +69,7 @@ namespace EttvAPI
                 app.UseHsts();
             }
 
+            app.UseCors("AllowMyOrigin");
             var swaggerOptions = new SwaggerOptions();
             Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
 
